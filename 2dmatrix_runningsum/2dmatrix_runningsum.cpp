@@ -19,10 +19,20 @@ struct XY
 	XY(int a, int b) : x(a), y(b) {}
 };
 
+//0,0 0,0 represents a rect of size 1
 struct rect
 {
-	XY topleft;
-	XY botright;
+	XY topleft; //represents the topmost leftmost cell in the rectangle
+	XY botright; //represents the bottommost rightmost coordiante in the rectangle
+
+	rect() {}
+	rect(XY a, XY b) : topleft(a), botright(b) {}
+
+	int area()
+	{
+		//+1 here to account for botright representing last index, not out-of-index position
+		return (botright.x - topleft.x + 1) * (botright.y - topleft.y + 1);
+	}
 };
 
 void calculate_running_sum(const vector<vector<int>>& original, vector<vector<long long>>& output)
@@ -30,17 +40,54 @@ void calculate_running_sum(const vector<vector<int>>& original, vector<vector<lo
 
 }
 
-rect naive_max_rect(const vector<vector<int>>& original)
+//O(n^6)
+long long naive_max_rect(const vector<vector<int>>& original, rect& out)
 {
-	rect out;
+	out.botright = XY(-1, -1);
+	long long max_area = 0;
 
+	//left top coordinate
+	for (int i = 0; i < original.size(); i++)
+	{
+		for (int j = 0; j < original[i].size(); j++)
+		{
+
+			//bottom right coordinate
+			for (int x = i; x < original.size(); x++)
+			{
+				for (int y = j; y < original[i].size(); y++)
+				{
+					
+					//do the sum
+					long long sum = 0;
+					for (int a = i; a <= x; a++)
+					{
+						for (int b = j; b <= y; b++)
+						{
+							sum += original[a][b];
+						}
+					}
+
+					rect test = rect(XY(i, j), XY(x, y));
+					if (sum >= max_area && out.area() >= test.area() )
+					{
+						out = test;
+						max_area = sum;
+
+					}
+
+				}
+			}
+
+		}
+	}
+
+	return max_area;
 }
 
+
 void init_array(vector<vector<int>> & out, const int MAX_ARRAY_SZ, const int MAX_ABS_NUM)
-{
-
-
-	
+{	
 	XY sz = XY(rand() % (MAX_ARRAY_SZ + 1), rand() % (MAX_ARRAY_SZ + 1));
 	out.resize(sz.x);
 	for (int i = 0; i < sz.x; i++)
@@ -66,7 +113,8 @@ void test()
 		vector<vector<int>> arr;
 		init_array(arr, MAX_ARRAY_SZ, MAX_ABS_NUM);
 
-
+		rect rect1;
+		long long result1 = naive_max_rect(arr, rect1);
 	}
 }
 
