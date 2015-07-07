@@ -277,7 +277,7 @@ long long naive_one_D_highest_delta(const vector<long long>& original, XY& out)
 		for (int j = i; j < original.size(); j++)
 		{
 			long long delta = original[j] - original[i];
-			if (delta > max_delta || (delta == max_delta && (j - i) >(out.x - out.y)))
+			if( sum_area_checker(delta, max_delta, (j - i), (out.y - out.x)))
 			{
 				max_delta = delta;
 				out.x = i;
@@ -291,7 +291,7 @@ long long naive_one_D_highest_delta(const vector<long long>& original, XY& out)
 long long one_D_highest_delta(const vector<long long>& original, XY& out)
 {
 	int min_index = 0;
-	int max_index = 0;
+	int max_index = -1;
 	int new_min_index = 0;
 	long long max_delta = 0;
 
@@ -389,21 +389,52 @@ long long one_D_based_max_rect(const vector<vector<int>>& original, rect& out)
 	return max_area;
 }
 
-void init_array(vector<vector<int>> & out, const int MAX_ARRAY_SZ, const int MAX_ABS_NUM)
+template <typename T>
+void init_array(vector<T>& out, const int MAX_ABS_NUM)
+{
+	for (int j = 0; j < out.size(); j++)
+	{
+		out[j] = rand() % (MAX_ABS_NUM * 2 + 1) - MAX_ABS_NUM;
+	}
+}
+
+void init_2D_array(vector<vector<int>> & out, const int MAX_ARRAY_SZ, const int MAX_ABS_NUM)
 {	
 	XY sz = XY(rand() % (MAX_ARRAY_SZ + 1), rand() % (MAX_ARRAY_SZ + 1));
 	out.resize(sz.x);
 	for (int i = 0; i < sz.x; i++)
 	{
 		out[i].resize(sz.y);
-		for (int j = 0; j < sz.y; j++)
-		{
-			out[i][j] = rand() % (MAX_ABS_NUM * 2 + 1) - MAX_ABS_NUM;
-		}
+		init_array(out[i], MAX_ABS_NUM);
 	}
 }
 
-void test()
+void test_1D()
+{
+	const int NUMTESTS = 100;
+	for (int test = 0; test < NUMTESTS; test++)
+	{
+		const int MAX_ARRAY_SZ = 10;
+		const int MAX_ABS_NUM = 10;
+
+		vector<long long> arr;
+		arr.resize(rand() % (MAX_ARRAY_SZ + 1));
+		init_array(arr, MAX_ABS_NUM);
+
+		XY p1, p2;
+		long long r1 = one_D_highest_delta(arr, p1);
+		long long r2 = naive_one_D_highest_delta(arr, p2);
+		
+		if (r1 != r2 || !(p1 == p2))
+		{
+			printf("1D test failed\n;");
+		}
+		
+		//naive_one_D_max()
+	}
+}
+
+void test_2D()
 {
 	const int NUMTESTS = 100;
 
@@ -414,7 +445,7 @@ void test()
 		const int MAX_ABS_NUM = 10;
 
 		vector<vector<int>> arr;
-		init_array(arr, MAX_ARRAY_SZ, MAX_ABS_NUM);
+		init_2D_array(arr, MAX_ARRAY_SZ, MAX_ABS_NUM);
 
 		const int NUM_IMPLEMENTATIONS = 4;
 
@@ -446,7 +477,8 @@ void test()
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	test();
+	test_1D();
+	test_2D();
 	return 0;
 }
 
