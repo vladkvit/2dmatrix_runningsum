@@ -297,7 +297,7 @@ long long one_D_highest_delta(const vector<long long>& original, XY& out)
 
 	for (int i = 0; i < original.size(); i++)
 	{
-		if ((original[i] - original[new_min_index]) > max_delta)
+		if( sum_area_checker(original[i] - original[new_min_index], max_delta, i-new_min_index, max_index - min_index) )
 		{
 			max_index = i;
 			min_index = new_min_index;
