@@ -18,7 +18,7 @@ struct XY
 	XY() : x(0), y(0) {}
 	XY(int a, int b) : x(a), y(b) {}
 
-	bool operator==(const XY& other)
+	bool operator==(const XY& other) const
 	{
 		return (x == other.x && y == other.y);
 	}
@@ -33,13 +33,13 @@ struct rect
 	rect() {}
 	rect(XY a, XY b) : topleft(a), botright(b) {}
 
-	int area()
+	int area() const
 	{
 		//+1 here to account for botright representing last index, not out-of-index position
 		return (botright.x - topleft.x + 1) * (botright.y - topleft.y + 1);
 	}
 
-	bool operator==(const rect& other)
+	bool operator==(const rect& other) const
 	{
 		return (topleft == other.topleft && botright == other.botright);
 	}
@@ -88,9 +88,9 @@ void calculate_running_sum(const vector<vector<int>>& original, vector<vector<lo
 	{
 		for (int j = 0; j < original[i].size(); j++)
 		{
-			output[i][j] = zeroed_array_access(output, XY(i-1,j)) \
-				+ zeroed_array_access(output, XY(i, j-1)) \
-				- zeroed_array_access(output, XY(i-1, j - 1)) \
+			output[i][j] = zeroed_array_access(output, XY(i-1,j))
+				+ zeroed_array_access(output, XY(i, j-1))
+				- zeroed_array_access(output, XY(i-1, j - 1))
 				+ original[i][j];
 		}
 	}
@@ -220,9 +220,9 @@ long long LUT_max_rect(const vector<vector<int>>& original, rect& out)
 				for (int y = j; y < original[i].size(); y++)
 				{
 
-					long long sum = zeroed_array_access( lut, XY(x, y )) \
-						- zeroed_array_access( lut, XY(i - 1,y )) \
-						- zeroed_array_access( lut, XY( x, j - 1 )) \
+					long long sum = zeroed_array_access( lut, XY(x, y ))
+						- zeroed_array_access( lut, XY(i - 1,y ))
+						- zeroed_array_access( lut, XY( x, j - 1 ))
 						+ zeroed_array_access( lut, XY( i - 1, j - 1 ));
 
 					rect test = rect(XY(i, j), XY(x, y));
@@ -322,14 +322,14 @@ long long one_D_based_max_rect(const vector<vector<int>>& original, rect& out)
 	long long max_area = 0;
 	out.botright = XY(-1, -1);
 
-	for (int x_left = 0; x_left < original.size(); x_left++)
+	for (size_t x_left = 0; x_left < original.size(); x_left++)
 	{
 		vector<int> accum;
 		accum.resize(original[x_left].size());
 
-		for (int x_right = x_left; x_right < original.size(); x_right++)
+		for (size_t x_right = x_left; x_right < original.size(); x_right++)
 		{
-			for (int i = 0; i < accum.size(); i++)
+			for (size_t i = 0; i < accum.size(); i++)
 			{
 				accum[i] += original[x_right][i];
 			}
