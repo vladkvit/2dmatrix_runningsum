@@ -55,12 +55,34 @@ T zeroed_array_access(const vector<vector<T>>& arr, const XY& point)
 		return arr[point.x][point.y];
 }
 
+void printnum(int in)
+{
+	printf("%d\t", in);
+}
+void printnum(long long in)
+{
+	printf("%lld\t", in);
+}
+
+template <typename T>
+void print_array(const vector<vector<T>>& arr)
+{
+	for (int i = 0; i < arr.size(); i++)
+	{
+		for (int j = 0; j < arr[i].size(); j++)
+		{
+			printnum(arr[i][j]);
+		}
+		printf("\n");
+	}
+	printf("\n");
+}
+
+//O(n^2)
 void calculate_running_sum(const vector<vector<int>>& original, vector<vector<long long>>& output)
 {
 	if (original.size() == 0)
 		return;
-
-	output[0][0] = original[0][0];
 
 	for (int i = 0; i < original.size(); i++)
 	{
@@ -68,10 +90,12 @@ void calculate_running_sum(const vector<vector<int>>& original, vector<vector<lo
 		{
 			output[i][j] = zeroed_array_access(output, XY(i-1,j)) \
 				+ zeroed_array_access(output, XY(i, j-1)) \
-				+ original[i][i];
-
+				- zeroed_array_access(output, XY(i-1, j - 1)) \
+				+ original[i][j];
 		}
 	}
+	//print_array(original);
+	//print_array(output);
 }
 
 template <typename T>
@@ -194,8 +218,19 @@ long long LUT_max_rect(const vector<vector<int>>& original, rect& out)
 			{
 				for (int y = j; y < original[i].size(); y++)
 				{
-					//long long sum = lut[x][y] - lut[]
 
+					long long sum = zeroed_array_access( lut, XY(x, y )) \
+						- zeroed_array_access( lut, XY(i - 1,y )) \
+						- zeroed_array_access( lut, XY( x, j - 1 )) \
+						+ zeroed_array_access( lut, XY( i - 1, j - 1 ));
+
+					rect test = rect(XY(i, j), XY(x, y));
+					if (sum >= max_area && out.area() <= test.area())
+					{
+						out = test;
+						max_area = sum;
+
+					}
 				}
 			}
 		}
@@ -233,15 +268,18 @@ void test()
 		vector<vector<int>> arr;
 		init_array(arr, MAX_ARRAY_SZ, MAX_ABS_NUM);
 
+		const int NUM_IMPLEMENTATIONS = 3;
+
 		vector<rect> rects;
-		rects.resize(2);
+		rects.resize(NUM_IMPLEMENTATIONS);
 		vector<long long> results;
-		results.resize(2);
+		results.resize(NUM_IMPLEMENTATIONS);
 		
 		results[0] = naive_max_rect(arr, rects[0]);
 		results[1] = faster_max_rect(arr, rects[1]);
+		results[2] = LUT_max_rect(arr, rects[2]);
 		
-		for (int i = 0; i < 2-1; i++)
+		for (int i = 0; i < NUM_IMPLEMENTATIONS - 1; i++)
 		{
 			if (results[i + 1] != results[i])
 			{
