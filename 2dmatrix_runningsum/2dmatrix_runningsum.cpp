@@ -78,6 +78,20 @@ void print_array(const vector<vector<T>>& arr)
 	printf("\n");
 }
 
+bool sum_area_checker(long long sumnew, long long sumold, int areanew, int areaold)
+{
+	if (sumnew > sumold)
+		return true;
+
+	if (sumnew < sumold)
+		return false;
+
+	if (areanew <= 0)
+		return false;
+
+	return areanew > areaold;
+}
+
 //O(n^2)
 void calculate_running_sum(const vector<vector<int>>& original, vector<vector<long long>>& output)
 {
@@ -137,7 +151,7 @@ long long naive_max_rect(const vector<vector<int>>& original, rect& out)
 					}
 
 					rect test = rect(XY(i, j), XY(x, y));
-					if (sum > max_area || ( sum == max_area && out.area() <= test.area() ))
+					if (sum_area_checker( sum, max_area, test.area(), out.area() ))
 					{
 						out = test;
 						max_area = sum;
@@ -179,7 +193,7 @@ long long faster_max_rect(const vector<vector<int>>& original, rect& out)
 					}
 
 					rect test = rect(XY(i, j), XY(x, y));
-					if ( running_sum_y > max_area || ( running_sum_y == max_area && out.area() <= test.area()))
+					if (sum_area_checker(running_sum_y, max_area, test.area(), out.area()))
 					{
 						out = test;
 						max_area = running_sum_y;
@@ -226,7 +240,7 @@ long long LUT_max_rect(const vector<vector<int>>& original, rect& out)
 						+ zeroed_array_access( lut, XY( i - 1, j - 1 ));
 
 					rect test = rect(XY(i, j), XY(x, y));
-					if (sum > max_area || ( sum == max_area && out.area() <= test.area()))
+					if (sum_area_checker(sum, max_area, test.area(), out.area()))
 					{
 						out = test;
 						max_area = sum;
@@ -314,6 +328,7 @@ long long one_D_max(const vector<int>& original, XY& out)
 	one_D_integral(original, integral, true);
 
 	long long result = naive_one_D_highest_delta(integral, out);
+	out.y--; //to account for the prepended zero
 
 	return result;
 }
@@ -363,7 +378,7 @@ long long one_D_based_max_rect(const vector<vector<int>>& original, rect& out)
 			long long sum = one_D_max(accum, range);
 
 			rect test = rect(XY(x_left, range.x), XY(x_right, range.y));
-			if (sum > max_area || ( sum == max_area && out.area() <= test.area()))
+			if (sum_area_checker(sum, max_area, test.area(), out.area()))
 			{
 				out = test;
 				max_area = sum;
