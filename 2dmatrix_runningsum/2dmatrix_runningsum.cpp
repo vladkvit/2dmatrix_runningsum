@@ -294,6 +294,29 @@ long long one_D_max(const vector<int>& original, XY& out)
 	return result;
 }
 
+//O(n^2)
+long long naive_one_D_max(const vector<int>& original, XY& out)
+{
+	long long max_sum = 0;
+	out.x = -1;
+
+	for (int i = 0; i < original.size(); i++)
+	{
+		long long sum = 0;
+		for (int j = i; j < original.size(); j++)
+		{
+			sum += original[j];
+			if (sum > max_sum || (sum == max_sum && (j-i+1) > (out.x - out.y) ))
+			{
+				max_sum = sum;
+				out.x = i;
+				out.y = j;
+			}
+		}
+	}
+	return max_sum;
+}
+
 long long one_D_based_max_rect(const vector<vector<int>>& original, rect& out)
 {
 	long long max_area = 0;
@@ -312,7 +335,7 @@ long long one_D_based_max_rect(const vector<vector<int>>& original, rect& out)
 			}
 
 			XY range;
-			long long sum = one_D_max(accum, range);
+			long long sum = naive_one_D_max(accum, range);
 			rect test = rect(XY(x_left, range.x), XY(x_right, range.y));
 			if (sum > max_area || ( sum == max_area && out.area() <= test.area()))
 			{
@@ -373,7 +396,7 @@ void test()
 			}
 			if (!(rects[i + 1] == rects[i]))
 			{
-				printf("test failed\n");
+				printf("rectangle result varies\n");
 				break;
 			}
 		}
