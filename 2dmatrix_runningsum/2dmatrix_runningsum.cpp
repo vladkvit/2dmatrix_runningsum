@@ -153,7 +153,7 @@ long long naive_max_rect(const vector<vector<int>>& original, rect& out)
 	return max_area;
 }
 
-//O(N^5)
+//O(n^5)
 long long faster_max_rect(const vector<vector<int>>& original, rect& out)
 {
 	out.botright = XY(-1, -1);
@@ -195,6 +195,7 @@ long long faster_max_rect(const vector<vector<int>>& original, rect& out)
 	return max_area;
 }
 
+//O(n^4)
 long long LUT_max_rect(const vector<vector<int>>& original, rect& out)
 {
 	long long max_area = 0;
@@ -239,7 +240,90 @@ long long LUT_max_rect(const vector<vector<int>>& original, rect& out)
 	return max_area;
 }
 
+void one_D_integral(const vector<int>& original, vector<long long>& out)
+{
+	out.resize(original.size());
+	out[0] = original[0];
+	for (int i = 1; i < out.size(); i++)
+	{
+		out[i] = out[i - 1] + original[i];
+	}
+}
 
+long long one_D_highest_delta(const vector<long long>& original, XY& out)
+{
+	int min_index = 0;
+	int max_index = 0;
+	int new_min_index = 0;
+	int max_delta = 0;
+
+	for (int i = 0; i < original.size(); i++)
+	{
+		if ((original[i] - original[new_min_index]) > max_delta)
+		{
+			max_index = i;
+			min_index = new_min_index;
+			max_delta = original[i] - original[new_min_index];
+		}
+		if (original[i] < original[new_min_index])
+		{
+			new_min_index = i;
+		}
+	}
+
+	out.x = min_index;
+	out.y = max_index;
+
+	return max_delta;
+}
+
+//solve the problem for the 1D case
+long long one_D_max(const vector<int>& original, XY& out)
+{
+	if (original.size() == 0)
+	{
+		out.y = -1;
+		return 0;
+	}
+	
+	vector<long long> integral;
+	one_D_integral(original, integral);
+
+	long long result = one_D_highest_delta(integral, out);
+
+	return result;
+}
+
+long long one_D_based_max_rect(const vector<vector<int>>& original, rect& out)
+{
+	long long max_area = 0;
+	out.botright = XY(-1, -1);
+
+	for (int x_left = 0; x_left < original.size(); x_left++)
+	{
+		vector<int> accum;
+		accum.resize(original[x_left].size());
+
+		for (int x_right = x_left; x_right < original.size(); x_right++)
+		{
+			for (int i = 0; i < accum.size(); i++)
+			{
+				accum[i] += original[x_right][i];
+			}
+
+			XY range;
+			long long sum = one_D_max(accum, range);
+			rect test = rect(XY(x_left, range.x), XY(x_right, range.y));
+			if (sum >= max_area && out.area() <= test.area())
+			{
+				out = test;
+				max_area = sum;
+
+			}
+		}
+	}
+	return max_area;
+}
 
 void init_array(vector<vector<int>> & out, const int MAX_ARRAY_SZ, const int MAX_ABS_NUM)
 {	
@@ -268,7 +352,7 @@ void test()
 		vector<vector<int>> arr;
 		init_array(arr, MAX_ARRAY_SZ, MAX_ABS_NUM);
 
-		const int NUM_IMPLEMENTATIONS = 3;
+		const int NUM_IMPLEMENTATIONS = 4;
 
 		vector<rect> rects;
 		rects.resize(NUM_IMPLEMENTATIONS);
@@ -278,6 +362,7 @@ void test()
 		results[0] = naive_max_rect(arr, rects[0]);
 		results[1] = faster_max_rect(arr, rects[1]);
 		results[2] = LUT_max_rect(arr, rects[2]);
+		results[3] = one_D_based_max_rect(arr, rects[3]);
 		
 		for (int i = 0; i < NUM_IMPLEMENTATIONS - 1; i++)
 		{
