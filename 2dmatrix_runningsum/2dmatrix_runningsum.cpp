@@ -327,7 +327,7 @@ long long one_D_max(const vector<int>& original, XY& out)
 	vector<long long> integral;
 	one_D_integral(original, integral, true);
 
-	long long result = naive_one_D_highest_delta(integral, out);
+	long long result = one_D_highest_delta(integral, out);
 	out.y--; //to account for the prepended zero
 
 	return result;
