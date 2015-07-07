@@ -137,7 +137,7 @@ long long naive_max_rect(const vector<vector<int>>& original, rect& out)
 					}
 
 					rect test = rect(XY(i, j), XY(x, y));
-					if (sum >= max_area && out.area() <= test.area() )
+					if (sum > max_area || ( sum == max_area && out.area() <= test.area() ))
 					{
 						out = test;
 						max_area = sum;
@@ -179,7 +179,7 @@ long long faster_max_rect(const vector<vector<int>>& original, rect& out)
 					}
 
 					rect test = rect(XY(i, j), XY(x, y));
-					if (running_sum_y >= max_area && out.area() <= test.area())
+					if ( running_sum_y > max_area || ( running_sum_y == max_area && out.area() <= test.area()))
 					{
 						out = test;
 						max_area = running_sum_y;
@@ -226,7 +226,7 @@ long long LUT_max_rect(const vector<vector<int>>& original, rect& out)
 						+ zeroed_array_access( lut, XY( i - 1, j - 1 ));
 
 					rect test = rect(XY(i, j), XY(x, y));
-					if (sum >= max_area && out.area() <= test.area())
+					if (sum > max_area || ( sum == max_area && out.area() <= test.area()))
 					{
 						out = test;
 						max_area = sum;
@@ -255,7 +255,7 @@ long long one_D_highest_delta(const vector<long long>& original, XY& out)
 	int min_index = 0;
 	int max_index = 0;
 	int new_min_index = 0;
-	int max_delta = 0;
+	long long max_delta = 0;
 
 	for (int i = 0; i < original.size(); i++)
 	{
@@ -314,7 +314,7 @@ long long one_D_based_max_rect(const vector<vector<int>>& original, rect& out)
 			XY range;
 			long long sum = one_D_max(accum, range);
 			rect test = rect(XY(x_left, range.x), XY(x_right, range.y));
-			if (sum >= max_area && out.area() <= test.area())
+			if (sum > max_area || ( sum == max_area && out.area() <= test.area()))
 			{
 				out = test;
 				max_area = sum;
